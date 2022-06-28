@@ -37,7 +37,7 @@ export function App() {
         });
     };
     getPicture();
-  }, [searchQuery,page]);
+  });
 
  
 
