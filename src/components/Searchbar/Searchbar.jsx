@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import s from './Searchbar.module.css';
 
 export function Searchbar({ onSubmit }) {
+  
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleInputChange = e => {

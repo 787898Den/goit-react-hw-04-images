@@ -1,7 +1,7 @@
 import { useState,useEffect } from 'react';
 import { Watch } from 'react-loader-spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import { ServiceAPI } from '../../service/API';
+import { getImages} from '../../service/API';
 import { ImageGallery } from '../ImageGallery';
 import s from '../ImageGallery/ImageGallery.module.css';
 import { Searchbar } from '../Searchbar';
@@ -27,38 +27,32 @@ export function App() {
       return;
     }
 
-    const getPicture = () => {
-      setStatus('pending');
-      ServiceAPI(searchQuery, page)
-        .then(dataProcessing)
-        .catch(error => {
-          setError(error);
-          setStatus('rejected');
-        });
-    };
-    getPicture();
-  });
+    async function getPicture(){
+     
 
- 
+      try {
+        setStatus('pending');
+        const images = await getImages(searchQuery,page)
 
-  const dataProcessing = response => {
-    const { hits: dataArray, totalHits } = response.data;
-    if (!dataArray.length) {
-      setStatus('rejected');
-      setError(new Error('Try to change the request'));
-      return;
-    }
-
-    window.scrollBy({
-      top: document.body.clientHeight,
-      behavior: 'smooth',
+        if (images.hits.length > 0) {
+          setData(prevState => [...prevState, ...images.hits]);
+          setTotal(images.totalHits)
+          setStatus('resolved');
+        }
+        
+        window.scrollBy({
+        top: document.body.clientHeight,
+        behavior: 'smooth',
+        
     });
-
-    setData(state => [...state, ...data]);
-    setTotal(totalHits);
-    setStatus('resolved');
-      
-  };
+      } catch (e) {
+        setError(error);
+        setStatus('rejected');
+      }
+    }
+    getPicture(searchQuery);
+  });
+  
 
   const handleSubmit = newSearchQuery => {
     if (searchQuery !== newSearchQuery) {
@@ -73,7 +67,7 @@ export function App() {
 
   const toggleModal = () => {
     setShowModal(false);
-    setImgId(imgId);
+    toggleModal();
     };
         
         
@@ -89,9 +83,8 @@ export function App() {
    return (
       <div className="App">
         <Searchbar onSubmit={handleSubmit} /> 
-        {data.length > 0 && (
           <ImageGallery data={data} onClick={clickOnImage} />
-        )}
+
         {status === 'resolved' && data.length > 0 && data.length < total && (
           <>
             <Button onClick={handleLoadMore} />
@@ -117,20 +110,20 @@ export function App() {
 
         {showModal && createPortal (
           <Modal onClose={toggleModal}>
-            <img src={handleData().imgId} alt="" />
+            <img src={handleData().imgUrl} alt={handleData().alt} />
           </Modal>,
           modalRoot
         )}
       </div>
    );
-  }
+  };
 
 
 
 // import { Component } from 'react';
 // import { Watch } from 'react-loader-spinner';
 // import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-// import { ServiceAPI } from '../../service/API';
+// import { getImages } from '../../service/API';
 // import { ImageGallery } from '../ImageGallery';
 // import s from '../ImageGallery/ImageGallery.module.css';
 // import { Searchbar } from '../Searchbar';
@@ -164,7 +157,7 @@ export function App() {
 //   getPicture = () => {
 //     const { query } = this.state;
 //     const { page } = this.state;
-//     ServiceAPI(query, page)
+//     getImages(query, page)
 //       .then(this.dataProcessing)
 //       .catch(error => this.setState({ error, status: 'rejected' }));
 //   };
