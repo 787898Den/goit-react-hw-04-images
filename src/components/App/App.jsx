@@ -51,8 +51,8 @@ export function App() {
         setStatus('rejected');
       }
     }
-    getPicture(searchQuery,page);
-  });
+    getPicture();
+  },[error,page,searchQuery]);
   
 
   const handleSubmit = newSearchQuery => {
