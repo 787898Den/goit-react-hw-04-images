@@ -35,9 +35,10 @@ export function App() {
         const images = await getImages(searchQuery,page)
 
         if (images.hits.length > 0) {
-          setData(prevState => [...prevState, ...images.hits]);
+          setData(state => [...state, ...images.totalHits]);
           setTotal(images.totalHits)
           setStatus('resolved');
+          return;
         }
         
         window.scrollBy({
@@ -50,7 +51,7 @@ export function App() {
         setStatus('rejected');
       }
     }
-    getPicture(searchQuery);
+    getPicture(searchQuery,page);
   });
   
 
