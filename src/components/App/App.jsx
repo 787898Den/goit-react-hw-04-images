@@ -110,9 +110,7 @@ export function App() {
         )}
 
         {status === 'rejected' && (
-          <div className={s.ImageGallery}>
-            <p>{`Something went wrong! ${error}`}</p>
-          </div>
+            <p className= {s.text}>{`Oppss! ${error}`}</p>
         )}
 
         {showModal && createPortal (

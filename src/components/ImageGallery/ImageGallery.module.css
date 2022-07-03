@@ -34,3 +34,8 @@
     position: relative;
     margin: 0 auto;
   }
+
+  .text{
+    margin: 0 auto;
+    font-size: 20px;
+  }
