@@ -22,6 +22,12 @@ export function App() {
   const [total, setTotal] = useState(0);
 
 
+   useEffect(() => {
+    setSearchQuery(searchQuery);
+    setPage(1);
+    setData([]);
+  }, [searchQuery]);
+
   useEffect(() => {
     if (!searchQuery) {
       return;
@@ -39,24 +45,29 @@ export function App() {
           setTotal(totalHits)
           setStatus('resolved');
         }
-        
+        else{
+          setError('Sorry, but nothing was found for your request 🧐')
+          setStatus('rejected');
+        }
         window.scrollBy({
         top: document.body.clientHeight,
         behavior: 'smooth',
         
     });
       } catch (e) {
-        setError(error);
+        setError((error));
         setStatus('rejected');
       }
     }
     getPicture();
   },[error,page,searchQuery]);
-  
 
+  
   const handleSubmit = newSearchQuery => {
     if (searchQuery !== newSearchQuery) {
       setSearchQuery(newSearchQuery);
+      setPage(1);
+      setData([]);
     }
     return;
   };
