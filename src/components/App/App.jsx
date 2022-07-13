@@ -15,8 +15,11 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
+
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState('idle');
+  const [isLoading, setIsLoading] = useState(null);
+  const [isEmpty, setIsEmpty] = useState (null);
+
   const [showModal, setShowModal] = useState(false);
   const [imgId, setImgId] = useState(null);
   const [total, setTotal] = useState(0);
@@ -33,30 +36,30 @@ export function App() {
       return;
     }
 
+    setIsLoading(true);
+
     async function getPicture(){
      
 
       try {
-        setStatus('pending');
         const {hits,totalHits} = await getImages(searchQuery,page)
 
         if (hits.length > 0) {
-          setData(state => [...state, ...hits]);
-          setTotal(totalHits)
-          setStatus('resolved');
+          setIsEmpty(true);
         }
-        else{
-          setError('Sorry, but nothing was found for your request 🧐')
-          setStatus('rejected');
-        }
+
+        setData(state => [...state, ...hits]);
+        setTotal(totalHits);
+
         window.scrollBy({
         top: document.body.clientHeight,
         behavior: 'smooth',
         
     });
       } catch (e) {
-        setError((error));
-        setStatus('rejected');
+        setError(e);
+      } finally{
+        setIsLoading(false);
       }
     }
     getPicture();
@@ -68,6 +71,9 @@ export function App() {
       setSearchQuery(newSearchQuery);
       setPage(1);
       setData([]);
+      setError(null);
+      setIsEmpty(null);
+      setTotal(0);
     }
     return;
   };
@@ -92,13 +98,13 @@ export function App() {
         <Searchbar onSubmit={handleSubmit} /> 
           <ImageGallery data={data} onClick={clickOnImage} />
 
-        {status === 'resolved' && data.length > 0 && data.length < total && (
+        {data.length > 0 && data.length < total && (
           <>
             <Button onClick={handleLoadMore} />
           </>
         )}
 
-        {status === 'pending' && (
+        {isLoading && (
           <div className={s.Watch}>
             <Watch
               color="blue"
@@ -109,8 +115,9 @@ export function App() {
           </div>
         )}
 
-        {status === 'rejected' && (
-            <p className= {s.text}>{`Oppss! ${error}`}</p>
+        {isEmpty  && (
+            <p className= {s.text}>Sorry, but nothing was found for your request 🧐
+            </p>
         )}
 
         {showModal && createPortal (
